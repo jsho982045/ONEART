@@ -38,10 +38,20 @@ export const publicEnv = {
 } as const;
 
 /**
- * Server-only secrets. Calling this from a Client Component will throw at
- * build/runtime because the variables are undefined in the browser bundle.
+ * Server-only values. Never import this into a Client Component.
+ *
+ * The service-role key is optional in v1: `place_splat` and the other writes
+ * are `SECURITY DEFINER` RPCs, so no privilege-bypassing client is needed.
+ * The slot exists for future admin-only server tasks. `requireServerEnv()`
+ * throws if something actually needs it and it is missing.
  */
 export function getServerEnv() {
+  return {
+    supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+  } as const;
+}
+
+export function requireServerEnv() {
   return {
     supabaseServiceRoleKey: required(
       "SUPABASE_SERVICE_ROLE_KEY",
