@@ -16,7 +16,7 @@ export async function SiteHeader({ overlay = false }: { overlay?: boolean }) {
         overlay ? "absolute inset-x-0 top-0 z-20" : ""
       }`}
     >
-      <Link href="/" className="text-[22px] font-bold leading-none tracking-[-0.04em]">
+      <Link href="/" className="text-[24px] font-display italic leading-none">
         oneart
       </Link>
       <nav className="flex items-center gap-5 text-[15px] font-medium">

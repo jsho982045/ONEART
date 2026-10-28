@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Sign up" };
 
 export default function SignupPage() {
   return (
-    <AuthShell title="Make your account" intro="One account, one click. You can look around the canvas without one.">
+    <AuthShell title="Make your account" intro="Free, and it takes a minute. You can look around the canvas without one.">
       <SignupForm />
     </AuthShell>
   );

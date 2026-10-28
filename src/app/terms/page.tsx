@@ -10,7 +10,7 @@ export default function TermsPage() {
     <>
       <SiteHeader />
       <main className="mx-auto max-w-[68ch] px-4 pb-24 pt-10">
-        <h1 className="text-3xl font-bold tracking-tight">Terms of use</h1>
+        <h1 className="text-3xl font-display font-normal tracking-[-0.005em]">Terms of use</h1>
         <p className="mt-2 text-graphite">Last updated: October 2026</p>
 
         {/* TODO(owner): This is a plain-language draft, not legal advice. Have a lawyer review it before launch. */}
@@ -21,56 +21,70 @@ export default function TermsPage() {
         <div className="prose-legal mt-8">
           <h2>What this is</h2>
           <p>
-            {SITE.name} is a single collaborative artwork. Each person who registers gets one click. The click places one
-            mark on the canvas. You choose where. The color, shape, size and rotation are generated automatically and you
-            can&apos;t change them. After you place your mark, your account can look at the canvas but can&apos;t add to it.
+            {SITE.name} is one shared canvas that anyone with an account can paint, draw or write on, live, alongside everyone
+            else. Each canvas is open for a fixed time (usually 30 days). When the time is up it closes for good and becomes a
+            single finished artwork.
           </p>
 
           <h2>Who owns the artwork</h2>
           <p>
-            The finished canvas, and every mark on it, belongs to {SITE.owner} (&ldquo;we&rdquo;). By placing a mark you
-            agree that we own the artwork as a whole and that we may display, reproduce, license and sell it, or any part
-            of it, in any form. You won&apos;t be paid and you won&apos;t share in any proceeds. Your mark is generated
-            by the site, and you keep no rights in it.
+            The finished canvas, and everything painted on it, belongs to {SITE.owner} (&ldquo;we&rdquo;). By painting on it,
+            you give us an irrevocable, worldwide, royalty-free right to display, reproduce, print, sell and adapt what you
+            painted as part of the artwork, in any form. You won&apos;t be paid and you won&apos;t share in any proceeds. If
+            we sell copies of the finished piece, participants may be offered a copy for a small fee.
           </p>
 
-          <h2>Your account</h2>
+          <h2>Painting fairly</h2>
           <ul>
-            <li>You must be 18 or older.</li>
-            <li>One person, one account, one click. Creating extra accounts to place more marks isn&apos;t allowed, and we may remove them.</li>
-            <li>Give a real email address you check. Throwaway addresses are blocked.</li>
-            <li>Keep your password private. You&apos;re responsible for what happens under your account.</li>
+            <li>You can only paint next to other people&apos;s work, never over it, and only erase your own.</li>
+            <li>
+              Everyone has a paint well that refills by itself. It exists so no single person can cover the canvas. Using
+              several accounts, scripts or bots to get around it isn&apos;t allowed.
+            </li>
+            <li>One person, one account.</li>
           </ul>
 
-          <h2>Usernames</h2>
+          <h2>What you can&apos;t paint</h2>
+          <ul>
+            <li>Hate, harassment or threats against anyone, or symbols of hate.</li>
+            <li>Sexual content, or anything that sexualises minors.</li>
+            <li>Someone else&apos;s personal information (addresses, phone numbers and so on).</li>
+            <li>Ads, spam, links or anything illegal.</li>
+            <li>Other people&apos;s copyrighted work, logos or characters.</li>
+          </ul>
           <p>
-            Your username is shown to anyone who hovers over or taps your mark, along with the date you placed it. Don&apos;t
-            use a name that is hateful, harassing, or someone else&apos;s. We may change or remove usernames that break
-            this rule.
+            Anyone can report a painting. We may hide anything that breaks these rules, and suspend accounts that do, without
+            notice. Hidden work is left out of the finished piece.
           </p>
 
-          <h2>Fair use of the site</h2>
+          <h2>Your name</h2>
           <p>
-            Don&apos;t try to break, overload, or get around the site, including its one-click limit. We may suspend
-            accounts that do.
+            Your username is shown to anyone who taps or hovers over your work, with the date you painted it. Don&apos;t pick a
+            username that impersonates someone or breaks the rules above.
           </p>
+
+          <h2>Age</h2>
+          <p>You need to be 18 or older to make an account.</p>
 
           <h2>Deleting your account</h2>
           <p>
-            You can ask us to delete your account. Your mark stays on the canvas, but it is no longer linked to your
-            username or email.
+            You can ask us to delete your account. What you painted stays on the canvas as part of the artwork, but it is no
+            longer linked to your name.
           </p>
 
-          <h2>Changes and availability</h2>
+          <h2>No guarantees</h2>
           <p>
-            We may change these terms or the site, and we may close the canvas when it&apos;s finished. The site is
-            provided as is, with no promises that it will always be available.
+            {SITE.name} is provided as is. We try hard to keep it running and to keep every stroke safe, but we can&apos;t
+            promise it will always be available or error-free.
           </p>
 
           <h2>Contact</h2>
           <p>
-            Questions: <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>. See also the{" "}
-            <Link href="/privacy">privacy policy</Link>.
+            Questions: <a className="text-link" href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>. See also the{" "}
+            <Link className="text-link" href="/privacy">
+              privacy policy
+            </Link>
+            .
           </p>
         </div>
       </main>

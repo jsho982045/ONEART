@@ -32,10 +32,20 @@ body {
   height: 100%;
 }
 
+button,
+a,
+input,
+label {
+  /* No double-tap-to-zoom delay on phones. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background: var(--wall);
   color: var(--ink);
-  font-feature-settings: "ss01", "kern";
+  font-feature-settings: "kern", "liga", "onum";
+  font-size: 17px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -90,6 +100,210 @@ body {
   }
   .prose-legal li {
     @apply mt-1.5;
+  }
+}
+
+/* ---- The studio: real materials ----------------------------------------------------------------- */
+
+.studio {
+  color: #231c16;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.studio input {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.hand-label {
+  font-family: "La Belle Aurore", cursive;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+@layer components {
+/* Glazed porcelain: the tool tray. */
+.tray {
+  background:
+    radial-gradient(120% 140% at 50% -40%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, #fbf8f2 0%, #f1ebe1 62%, #e7dfd2 100%);
+  border-radius: 26px 26px 0 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -10px 18px -12px rgba(110, 90, 60, 0.35),
+    0 -2px 10px rgba(60, 42, 22, 0.08),
+    0 18px 40px rgba(60, 42, 22, 0.22);
+  border: 1px solid rgba(160, 140, 112, 0.35);
+  border-bottom: 0;
+}
+
+@media (min-width: 640px) {
+  .tray {
+    border-bottom: 1px solid rgba(160, 140, 112, 0.35);
+  }
+}
+
+/* Heavy laid paper: sheets, cards and menus. */
+.paper {
+  background:
+    repeating-linear-gradient(90deg, rgba(120, 95, 60, 0.025) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, #fdfbf6, #f6f1e7);
+  border: 1px solid rgba(160, 140, 112, 0.32);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 24px 60px rgba(50, 34, 18, 0.24),
+    0 4px 12px rgba(50, 34, 18, 0.1);
+}
+
+.porcelain-chip,
+.porcelain-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #fdfbf7, #efe8dc);
+  border: 1px solid rgba(150, 128, 98, 0.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 2px rgba(60, 42, 22, 0.12),
+    0 6px 16px rgba(60, 42, 22, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.porcelain-btn {
+  border-radius: 14px;
+}
+
+/* Buttons and chips are set in Fell small capitals, the way a printer would label a plate. */
+.porcelain-chip,
+.porcelain-btn {
+  font-family: "IM Fell English SC", "IM Fell English", Georgia, serif;
+  font-weight: 400 !important;
+  letter-spacing: 0.035em;
+}
+
+.font-display {
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+/* The one dark, glazed button per screen: the main thing to do. */
+.btn-ink {
+  color: #fbf8f1;
+  background: linear-gradient(180deg, #3d3229 0%, #231c16 55%, #1a140f 100%);
+  border-color: rgba(20, 14, 9, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 220, 0.22),
+    0 1px 2px rgba(40, 25, 10, 0.25),
+    0 8px 20px rgba(40, 25, 10, 0.22);
+}
+
+.btn-ink:hover {
+  background: linear-gradient(180deg, #4a3d32 0%, #2c231c 55%, #1f1813 100%);
+}
+
+.porcelain-btn:active,
+.porcelain-chip:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    inset 0 1px 2px rgba(60, 42, 22, 0.18),
+    0 1px 2px rgba(60, 42, 22, 0.08);
+}
+
+/* A wooden artist's palette under the pigments. */
+.palette-board {
+  background:
+    radial-gradient(60% 80% at 20% 10%, rgba(255, 240, 210, 0.45), transparent 70%),
+    repeating-linear-gradient(97deg, rgba(90, 55, 25, 0.06) 0 2px, transparent 2px 9px),
+    linear-gradient(160deg, #d6b88c, #c29a68 60%, #b48a58);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 245, 225, 0.7),
+    inset 0 -6px 14px rgba(80, 45, 15, 0.25),
+    0 2px 6px rgba(60, 40, 20, 0.18);
+}
+
+.studio-range,
+.hue-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 28px;
+  background: transparent;
+}
+
+.studio-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e3d9ca, #b9a68b);
+  box-shadow: inset 0 1px 2px rgba(60, 40, 20, 0.25);
+}
+
+.hue-range::-webkit-slider-runnable-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.studio-range::-webkit-slider-thumb,
+.hue-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #efe7da 60%, #d2c4ae);
+  border: 1px solid rgba(120, 100, 70, 0.4);
+  box-shadow: 0 2px 6px rgba(50, 34, 18, 0.3);
+}
+
+.hue-range::-webkit-slider-thumb {
+  margin-top: -7px;
+}
+
+.studio-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e3d9ca, #b9a68b);
+}
+
+.hue-range::-moz-range-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+}
+
+.studio-range::-moz-range-thumb,
+.hue-range::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff, #efe7da 60%, #d2c4ae);
+  border: 1px solid rgba(120, 100, 70, 0.4);
+  box-shadow: 0 2px 6px rgba(50, 34, 18, 0.3);
+}
+
+}
+
+@keyframes fadeLift {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheetUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 

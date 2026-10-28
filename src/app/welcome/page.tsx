@@ -23,7 +23,7 @@ export default async function WelcomePage({ searchParams }: { searchParams: { ne
   return (
     <AuthShell
       title="One more step"
-      intro="Choose a username and confirm the terms. Then you can place your mark."
+      intro="Choose the name that signs your work and confirm the terms. Then pick up a brush."
     >
       <WelcomeForm next={next} />
     </AuthShell>

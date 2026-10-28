@@ -13,14 +13,10 @@ const config: Config = {
         alert: "var(--alert)",
       },
       fontFamily: {
-        sans: [
-          '"Bricolage Grotesque Variable"',
-          "ui-sans-serif",
-          "system-ui",
-          "-apple-system",
-          "Segoe UI",
-          "sans-serif",
-        ],
+        sans: ['"EB Garamond Variable"', '"EB Garamond"', "Garamond", "Georgia", "serif"],
+        display: ['"IM Fell English"', '"EB Garamond Variable"', "Georgia", "serif"],
+        caps: ['"IM Fell English SC"', '"IM Fell English"', "Georgia", "serif"],
+        hand: ['"La Belle Aurore"', "cursive"],
       },
     },
   },

@@ -31,7 +31,7 @@ export function SignupForm() {
     return (
       <div role="status">
         <p className="text-[17px] leading-[1.5]">
-          Check <strong>{sentTo}</strong> for a link to confirm your address. After that you can place your mark.
+          Check <strong>{sentTo}</strong> for a link to confirm your address. After that you can start painting.
         </p>
         <p className="mt-3 text-graphite">
           Nothing there after a few minutes? Check spam, or{" "}
@@ -147,7 +147,7 @@ export function SignupForm() {
             aria-describedby="username-hint"
           />
           <p id="username-hint" className="field-hint">
-            Shown when someone hovers over your mark. Letters, numbers and underscores.
+            Signs everything you paint. Letters, numbers and underscores.
           </p>
         </div>
 
@@ -172,8 +172,8 @@ export function SignupForm() {
         </div>
 
         <div className="rounded-[4px] border border-rule p-4 text-[15px] leading-[1.55] text-graphite">
-          We ask for these three things for two reasons only: so each person gets one click, and so we can email you
-          once when the finished piece is ready. No marketing.
+          We ask for these three things for two reasons only: so every stroke is signed by a real person, and so we can
+          email you when the canvas is about to close and when the finished piece is ready. No marketing.
         </div>
 
         <div className="space-y-3">
@@ -202,8 +202,8 @@ export function SignupForm() {
               <Link href="/privacy" target="_blank" className="text-link">
                 privacy policy
               </Link>
-              . My mark becomes part of one artwork owned by {SITE.owner}, which may be sold. I won&apos;t be paid or
-              share in the proceeds.
+              . What I paint becomes part of one artwork owned by {SITE.owner}, which may be sold. I won&apos;t be paid
+              or share in the proceeds.
             </span>
           </label>
         </div>

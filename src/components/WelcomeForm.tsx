@@ -65,7 +65,7 @@ export function WelcomeForm({ next }: { next: string }) {
           aria-describedby="username-hint"
         />
         <p id="username-hint" className="field-hint">
-          Shown when someone hovers over your mark. Letters, numbers and underscores.
+          Signs everything you paint. Letters, numbers and underscores.
         </p>
       </div>
 
@@ -95,8 +95,8 @@ export function WelcomeForm({ next }: { next: string }) {
             <Link href="/privacy" target="_blank" className="text-link">
               privacy policy
             </Link>
-            . My mark becomes part of one artwork owned by {SITE.owner}, which may be sold. I won&apos;t be paid or
-            share in the proceeds.
+            . What I paint becomes part of one artwork owned by {SITE.owner}, which may be sold. I won&apos;t be paid
+            or share in the proceeds.
           </span>
         </label>
       </div>

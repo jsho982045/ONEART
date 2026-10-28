@@ -1,90 +1,125 @@
 # oneart
 
-One click each. One canvas. Every registered person places exactly one randomly generated mark (random color, shape, size and rotation) and chooses only where. After that their account is view-only. The finished artwork is owned by Skyline Avenue LLC.
+One canvas for the whole world. Anyone can paint, draw or write anything, live, alongside everyone else, with pencil,
+dip-pen ink, charcoal, watercolor, an oil bristle brush and hand lettering on a woven cotton canvas. Each canvas is open for
+a fixed time (30 days by default), then it's finished forever. Everyone who painted on it can buy the full-resolution piece.
 
-Stack: Next.js 14 (App Router, TypeScript), Tailwind, Supabase (Postgres, Auth, Realtime), Vercel.
+The artwork and project belong to Skyline Avenue LLC.
 
-## How it works
+Stack: Next.js 14 (App Router, TypeScript), Tailwind, Supabase (Postgres, Auth, Realtime, Storage), Stripe, Railway.
 
-- The database stores only `x`, `y` and a random `seed` per mark. The seed is picked **server-side** inside the `place_splat` function, so nobody can influence what their mark looks like.
-- `src/lib/splat.ts` turns a seed into a shape. Same seed gives the same splat everywhere, forever. The order of `rand()` calls is part of the data format. Change output and you must bump `ALGO_VERSION`.
-- One click per account is enforced in Postgres (row lock, unique constraint, verified email required), not in the UI.
-- Who made which mark lives in `splat_owners`, which the API cannot read. Hover and tap info comes from the `splat_owner` function, which returns only username and date.
-- Canvas rendering is HTML canvas with pan, pinch, wheel zoom and keyboard controls. The live counter and new marks arrive through Supabase Realtime.
-
-## Run it locally
+## Try it in two minutes (no accounts, no database)
 
 ```bash
 npm install
-cp .env.local.example .env.local   # then fill it in
-npm run dev
+npm run dev:local        # http://localhost:3003
 ```
 
-Without Supabase keys the app still runs and shows a setup notice.
+Local test mode keeps everything in your browser. Open the canvas in two tabs (or two windows side by side): each tab is a
+different artist, and you'll see each other paint live. Wipe it from the account menu ("Wipe local test canvas").
 
-## Set up Supabase (do dev first)
+## How it works
 
-Use two separate projects: `oneart-dev` and `oneart-prod`. Never point local development at prod.
+| Piece | Where |
+|---|---|
+| Brushes, canvas texture, sound | `src/lib/paint/brushes.ts`, `geometry.ts`, `textures.ts`, `sound.ts` |
+| Rendering (zoom levels, chunks, the no-overpainting rule) | `src/lib/paint/renderer.ts`, `ownership.ts` |
+| The studio (input, camera, realtime, undo) | `src/lib/studio/engine.ts`, `src/components/studio/*` |
+| Data access (Supabase or local test mode) | `src/lib/backend/*` |
+| Database rules | `supabase/migrations/*.sql` |
+| Background worker (overview tiles, finished piece, emails) | `scripts/worker.ts` |
+| Buying the finished piece | `src/app/api/checkout`, `src/app/api/stripe/webhook`, `src/app/api/download`, `src/app/piece` |
+| Moderation and scheduling canvases | `/admin` (`src/components/AdminConsole.tsx`) |
 
-1. Create `oneart-dev` at supabase.com.
-2. Open **SQL Editor**, paste `supabase/migrations/20261004000000_init.sql`, run it. (Or use the Supabase CLI: `supabase link` then `supabase db push`.)
-3. **Project Settings → API**: copy the Project URL and the anon key into `.env.local`. Use only the anon key in this app. Never the service role key.
-4. **Authentication → URL Configuration**: Site URL `http://localhost:3000`, add redirect URL `http://localhost:3000/auth/callback`.
-5. **Authentication → Providers → Email**: keep "Confirm email" on. `place_splat` requires a verified email.
-6. Check that **Database → Replication** includes `splats` and `canvas_meta` (the migration adds them).
-7. When dev works, repeat for `oneart-prod` with your real domain, and apply the same migration there.
+- **Painting.** Strokes are stored as compact points (`src/lib/paint/codec.ts`). The database decodes them itself to work out
+  bounds and ink cost, so a modified browser can't lie about either.
+- **No painting over other people.** Every screen (and the final render) paints strokes in order and clips each stroke against
+  earlier strokes by other artists, with a few pixels of edge tolerance. You can always paint over your own work.
+- **The paint well.** Everyone has a generous well that refills continuously (per-canvas settings). A stroke is never cut off
+  mid-line; the well may dip below empty and simply takes longer to refill. 90 strokes a minute is the hard rate limit.
+- **Who painted what.** Tap the loupe, then any painting. Usernames and dates only; emails never leave the database.
+- **Far zoom.** The worker bakes overview tiles to Supabase Storage every few minutes, so seeing the whole canvas never means
+  downloading every stroke. Strokes newer than the last bake are painted on top live.
+- **The finished piece.** Ten minutes after a canvas closes, the worker renders it at one pixel per canvas unit (12000 × 8000 by
+  default) into a private bucket, plus a watermarked, reduced public preview. The real file is only ever handed out as a
+  one-minute signed link, after the server has checked the purchase.
 
-### Google sign-in
+## Set up Supabase (dev first)
 
-1. Google Cloud Console → APIs & Services → Credentials → Create OAuth client ID (Web application).
-2. Authorized redirect URI: `https://<your-project-ref>.supabase.co/auth/v1/callback` (one per Supabase project).
-3. Supabase → Authentication → Providers → Google: paste the client ID and secret, enable.
-4. First-time Google users land on `/welcome` to choose a username and accept the terms.
+Use two projects: `oneart-dev` and `oneart-prod` (East US). Never point local development at prod.
 
-### Email and bots
+1. Create `oneart-dev`. In **SQL Editor** run every file in `supabase/migrations/` **in order** (or `supabase link` +
+   `supabase db push`). The first file is the original schema; the later ones replace the one-click model.
+2. **Project Settings → API**: put the URL and anon key in `.env.local`. The service role key goes only where the README says.
+3. **Authentication → URL Configuration**: Site URL `http://localhost:3003`, redirect URL `http://localhost:3003/auth/callback`.
+4. **Authentication → Providers → Email**: keep "Confirm email" on.
+5. **Database → Replication**: check `strokes` is in the `supabase_realtime` publication (the migration adds it).
+6. **Storage**: the migrations create two buckets: `tiles` (public) and `finals` (private). Check they exist; if your project
+   didn't allow it, create them by hand with those names and visibility. Raise the per-file limit on `finals` to 100 MB.
+7. Make yourself a moderator: `update public.profiles set is_admin = true where lower(username) = lower('your_name');`
+8. Set the real dates of the first canvas in `/admin` (or `update public.canvases set opens_at = ..., closes_at = ...`).
 
-- Supabase's built-in email is rate limited and meant for testing. Before launch, set up custom SMTP (Resend, Postmark, SES) under Authentication → SMTP Settings, with SPF/DKIM on your domain.
-- Optional bot check: create a Cloudflare Turnstile widget, put the site key in `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, and put the secret key in Supabase → Authentication → Attack Protection → CAPTCHA.
+Google sign-in: Google Cloud Console → OAuth client (Web) → redirect URI `https://<project-ref>.supabase.co/auth/v1/callback`
+→ paste into Supabase → Authentication → Providers → Google. First-time Google users pick a username on `/welcome`.
 
-## Deploy on Vercel
+Before launch: custom SMTP (Resend/Postmark) under Authentication → SMTP Settings, and Turnstile (see `.env.local.example`).
 
-1. Import the repo in Vercel.
-2. Production Branch: `main`. Preview deployments for `dev` and feature branches.
-3. Environment variables:
-   - Production: the `oneart-prod` URL and anon key.
-   - Preview and Development: the `oneart-dev` URL and anon key.
-4. Add your domain, then add it to Supabase redirect URLs (Site URL and `/auth/callback`).
+## Deploy on Railway
 
-## Git workflow
+Railway project **OneArt**, environment `production`, region US East (Virginia). Railway no longer reads config files
+(Config-as-code is deprecated), so these are set in each service's **Settings** tab:
 
-`main` is production. `dev` is integration. Cut feature branches from `dev`, merge them into `dev`, and promote `dev` to `main` when ready.
+| | **web** (existing `ONEART` service) | **worker** (second service, same repo) |
+|---|---|---|
+| Source | `jsho982045/ONEART`, branch `main`, auto-deploy on | same |
+| Build | Railpack default (`npm run build`) | Railpack default |
+| Start command | default (`npm run start`, listens on `$PORT`) | `npm run worker` |
+| Healthcheck path | `/api/health` | none |
+| Public networking | `drawoneart.com` | none |
+| Restart policy | On failure | Always |
+| Memory | default | at least 2 GB (renders the finished piece) |
+
+Variables:
+
+| Variable | web | worker |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | ✓ | ✓ |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✓ | |
+| `NEXT_PUBLIC_SITE_URL` (`https://drawoneart.com`) | ✓ | ✓ |
+| `SUPABASE_SERVICE_ROLE_KEY` | ✓ (Stripe webhook, downloads) | ✓ |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | optional | |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | when selling | |
+| `RESEND_API_KEY`, `EMAIL_FROM` | | optional |
+
+`NEXT_PUBLIC_*` values are baked in at build time, so redeploy after changing them.
+
+## Stripe
+
+1. Stripe account under Skyline Avenue LLC (test mode first).
+2. Put the secret key in `STRIPE_SECRET_KEY`.
+3. Locally: `stripe listen --forward-to localhost:3003/api/stripe/webhook` and copy the `whsec_...` into
+   `STRIPE_WEBHOOK_SECRET`. In production: Dashboard → Webhooks → endpoint `https://<domain>/api/stripe/webhook` with events
+   `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`.
+4. Price per canvas is `canvases.price_cents` (default 199) and `currency` (default usd). Only people who painted on a canvas
+   can buy it (`has_painted`).
 
 ## Tests
 
 ```bash
-npm run test       # splat generator, including golden values
-npm run test:db    # database rules, in an in-memory Postgres (PGlite)
-npm run typecheck
-npm run lint
+npm run check      # typecheck, lint, unit tests, database tests
+npm run build
 ```
 
-`test:db` loads the real migration into PGlite (Postgres compiled to WebAssembly) with a stubbed `auth` schema. It checks the one-click rule, bounds, privacy and grants. It is not a replacement for trying the flow against `oneart-dev`. The "parallel attempts" test is serialized by PGlite, so it does not prove behavior under real concurrency. The row lock in `place_splat` is what protects against that in Supabase.
-
-`/dev/splat-lab` shows a gallery of generated marks. It returns 404 in production.
-
-## Before you launch (TODO)
-
-- [ ] Replace `contactEmail` in `src/lib/site.ts`.
-- [ ] Have a lawyer review `/terms` and `/privacy`. They are plain-language drafts.
-- [ ] Set up custom SMTP and email templates.
-- [ ] Enable Turnstile.
-- [ ] Add your domain to Supabase redirect URLs and Google OAuth.
-- [ ] Try the full flow on dev: sign up, confirm, place, hover, share link, Google, password reset.
-- [ ] Decide how and when "the finished piece is ready" emails go out. This app collects the addresses but does not send them.
+- `npm run test` covers the codec, geometry (golden determinism), ownership rule, ink well, camera, stroke store, local mode,
+  and **TypeScript ↔ SQL parity** (the browser's predicted bounds and ink cost against the real migration).
+- `npm run test:db` loads every migration into PGlite (Postgres in WebAssembly) with a stub of Supabase's auth and tries to
+  break the rules: who can paint, validation, the canvas window, ink, rate limits, erasing, reports, moderation, bans,
+  purchases, admin tools, usernames. It is not a replacement for trying the flow on `oneart-dev`.
+- CI (`.github/workflows/ci.yml`) runs all of it on every pull request and push to `main`.
 
 ## Known limits
 
-- **No tiling.** The viewer loads marks for the visible area, up to `MAX_LOAD` (10,000). A fully zoomed-out view of a very large canvas shows only part of it. Add pre-rendered tiles before you expect tens of thousands of marks.
-- **Deleting an account** keeps the mark but anonymizes it. Someone who deletes their account and registers again with the same email could get another click. If that matters, store a hash of deleted emails and block them in `handle_new_user`.
-- **Throwaway emails:** the blocklist in `src/lib/disposable.ts` is short and static. It slows casual abuse and nothing more. Real defense is email verification plus Turnstile.
-- Owned by Skyline Avenue LLC. Contributors are not paid. This is stated at signup, in the terms and in the privacy policy.
+- Supabase Realtime broadcast carries live "ghost" strokes; under heavy load some ghost updates can drop. Finished strokes always
+  arrive through the database.
+- Overview tiles lag up to one worker interval (5 min) behind erasures and moderation at far zoom. Zoomed in, changes are live.
+- Deleting an account keeps the paintings but anonymises them.
