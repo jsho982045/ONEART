@@ -30,7 +30,7 @@ export default function TermsPage() {
           <p>
             The finished canvas, and everything painted on it, belongs to {SITE.owner} (&ldquo;we&rdquo;). By painting on it,
             you give us an irrevocable, worldwide, royalty-free right to display, reproduce, print, sell and adapt what you
-            painted as part of the artwork, in any form. You won&apos;t be paid and you won&apos;t share in any proceeds. If
+            painted as part of the artwork, in any form. If
             we sell copies of the finished piece, participants may be offered a copy for a small fee.
           </p>
 

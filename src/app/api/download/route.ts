@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { publicOrigin } from "@/lib/public-origin";
 import { FINALS_BUCKET, finalPath } from "@/lib/finished";
 import { serviceClient } from "@/lib/server/service";
 import { createSupabaseServer } from "@/lib/supabase/server";
@@ -7,7 +8,8 @@ export const dynamic = "force-dynamic";
 
 /** Hands a buyer a one-minute download link for the full-resolution file. Nobody else ever gets one. */
 export async function GET(req: NextRequest) {
-  const { searchParams, origin } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
+  const origin = publicOrigin(req);
   const slug = searchParams.get("c") ?? "";
   const supabase = createSupabaseServer();
   const { data: auth } = await supabase.auth.getUser();

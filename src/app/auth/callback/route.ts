@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { publicOrigin } from "@/lib/public-origin";
 import { safeNext } from "@/lib/safe-next";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
@@ -7,7 +8,8 @@ import { createSupabaseServer } from "@/lib/supabase/server";
  * Exchanges the one-time code for a session, then sends the person on their way.
  */
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  const origin = publicOrigin(request);
   const code = searchParams.get("code");
   const next = safeNext(searchParams.get("next"));
 

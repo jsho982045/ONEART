@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { publicOrigin } from "@/lib/public-origin";
 import { getStripe, stripeConfigured } from "@/lib/server/stripe";
 import { createSupabaseServer } from "@/lib/supabase/server";
 
@@ -9,7 +10,7 @@ export const dynamic = "force-dynamic";
  * without JavaScript. Who is buying comes from the session cookie, never from the form.
  */
 export async function POST(req: NextRequest) {
-  const origin = new URL(req.url).origin;
+  const origin = publicOrigin(req);
   const form = await req.formData();
   const slug = String(form.get("canvas") ?? "");
   const back = (q: string) => NextResponse.redirect(`${origin}/piece?c=${encodeURIComponent(slug)}&${q}`, 303);

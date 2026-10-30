@@ -202,8 +202,7 @@ export function SignupForm() {
               <Link href="/privacy" target="_blank" className="text-link">
                 privacy policy
               </Link>
-              . What I paint becomes part of one artwork owned by {SITE.owner}, which may be sold. I won&apos;t be paid
-              or share in the proceeds.
+              . What I paint becomes part of one artwork owned by {SITE.owner}, which may be sold.
             </span>
           </label>
         </div>
